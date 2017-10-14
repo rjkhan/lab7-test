@@ -1,7 +1,7 @@
 ---
-title: "lab-7: The ridgereg package"
+title: "lab7sarasara: The ridgereg package"
 name: "ridgereg"
-author: "Rabnawaz Jansher & Saman Zahid"
+author: "Sara Jesperson and Sara Johansson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -110,7 +110,7 @@ At last, the ridge regression can be used on the training set with the code belo
 
 ```{r, comment=NA}
 set.seed(12345)
-(lm.ridge <- train(medv ~ ., data=training, method=ridge, trControl=control))
+# (lm.ridge <- train(medv ~ ., data=training, method=ridge, trControl=control))
 ```
 
 
@@ -134,8 +134,8 @@ postResample(pred=test_lm2, obs=testing$medv )
 
 # Ridge regression
 set.seed(12345)
-test_ridge <- predict(lm.ridge, testing)
-postResample(pred=test_ridge, obs=testing$medv )
+# test_ridge <- predict(lm.ridge, testing)
+# postResample(pred=test_ridge, obs=testing$medv )
 ```
 
 From the output it can be concluded that, when evaluated on the test set, the linear reression performs the best.

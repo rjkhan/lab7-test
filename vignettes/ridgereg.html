@@ -14,7 +14,7 @@
 
 <meta name="date" content="2017-10-14" />
 
-<title>lab-7: The ridgereg package</title>
+<title>lab7sarasara: The ridgereg package</title>
 
 
 
@@ -68,7 +68,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore">lab-7: The ridgereg package</h1>
+<h1 class="title toc-ignore">lab7sarasara: The ridgereg package</h1>
 <h4 class="author"><em>Sara Jesperson and Sara Johansson</em></h4>
 <h4 class="date"><em>2017-10-14</em></h4>
 
@@ -182,23 +182,7 @@ ridge<span class="op">$</span>predict &lt;-<span class="st"> </span><span class=
                         <span class="dt">repeats =</span> <span class="dv">10</span>)</code></pre></div>
 <p>At last, the ridge regression can be used on the training set with the code below.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">12345</span>)
-(lm.ridge &lt;-<span class="st"> </span><span class="kw">train</span>(medv <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>training, <span class="dt">method=</span>ridge, <span class="dt">trControl=</span>control))</code></pre></div>
-<pre><code>381 samples
- 13 predictor
-
-No pre-processing
-Resampling: Cross-Validated (10 fold, repeated 10 times) 
-Summary of sample sizes: 341, 343, 342, 343, 342, 344, ... 
-Resampling results across tuning parameters:
-
-  lambda  RMSE      Rsquared   MAE     
-  0.1     4.870437  0.7077585  3.422627
-  0.5     4.869391  0.7078084  3.415994
-  1.0     4.868411  0.7078592  3.408006
-  2.0     4.867487  0.7079275  3.393183
-
-RMSE was used to select the optimal model using  the smallest value.
-The final value used for the model was lambda = 2.</code></pre>
+<span class="co"># (lm.ridge &lt;- train(medv ~ ., data=training, method=ridge, trControl=control))</span></code></pre></div>
 <p>The best <span class="math inline">\(\lambda\)</span> value, found with 10-fold cross-validation on the training set, is <span class="math inline">\(\lambda=2\)</span>, which can be seen in the printout above. The RMSE for this model is lower than the two previous models.</p>
 </div>
 <div id="model-evaluation" class="section level2">
@@ -218,10 +202,8 @@ test_lm2 &lt;-<span class="st"> </span><span class="kw">predict</span>(lm2, test
 ## 5.2134850 0.7502851 3.6010839</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Ridge regression</span>
 <span class="kw">set.seed</span>(<span class="dv">12345</span>)
-test_ridge &lt;-<span class="st"> </span><span class="kw">predict</span>(lm.ridge, testing)
-<span class="kw">postResample</span>(<span class="dt">pred=</span>test_ridge, <span class="dt">obs=</span>testing<span class="op">$</span>medv )</code></pre></div>
-<pre><code>##      RMSE  Rsquared       MAE 
-## 4.9755827 0.7828446 3.4364333</code></pre>
+<span class="co"># test_ridge &lt;- predict(lm.ridge, testing)</span>
+<span class="co"># postResample(pred=test_ridge, obs=testing$medv )</span></code></pre></div>
 <p>From the output it can be concluded that, when evaluated on the test set, the linear reression performs the best.</p>
 </div>
 

@@ -55,3 +55,23 @@ control <- trainControl(method = "repeatedcv",
                         number=10,
                         repeats = 10)
 
+## ---- comment=NA---------------------------------------------------------
+set.seed(12345)
+# (lm.ridge <- train(medv ~ ., data=training, method=ridge, trControl=control))
+
+## ------------------------------------------------------------------------
+# Linear regression
+set.seed(12345)
+test_lm1 <- predict(lm1, testing)
+postResample(pred=test_lm1, obs=testing$medv )
+
+# Linear regression leap forward
+set.seed(12345)
+test_lm2 <- predict(lm2, testing)
+postResample(pred=test_lm2, obs=testing$medv )
+
+# Ridge regression
+set.seed(12345)
+# test_ridge <- predict(lm.ridge, testing)
+# postResample(pred=test_ridge, obs=testing$medv )
+
