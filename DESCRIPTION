@@ -1,0 +1,24 @@
+Package: lab7
+Type: Package
+Title: This is lab7 for rigereg
+Version: 1.0
+Date: 2017-09-09
+Author: Saman Zahid [aut, cre],
+        Rabnawaz [aut]
+Maintainer: rabnawaz jandher <rabsh696@student.liu.se>
+Description: A linear regression which compute basic statistic function package in R with QR decompsition.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Depends: R (>= 2.10)
+Imports: ggplot2
+Suggests: testthat, knitr,ggplot2,
+    rmarkdown,
+    magick,
+    grid,
+    nycflights13,
+    dplyr,
+    mlbench,
+    caret,leaps
+VignetteBuilder: knitr

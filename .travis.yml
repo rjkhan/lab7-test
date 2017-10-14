@@ -1,0 +1,4 @@
+language: r
+cache: packages
+before_install:
+  - Rscript -e 'install.packages("caret", dependencies = TRUE)'
