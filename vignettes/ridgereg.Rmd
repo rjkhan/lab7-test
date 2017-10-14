@@ -1,0 +1,141 @@
+---
+title: "lab-7: The ridgereg package"
+name: "ridgereg"
+author: "Rabnawaz Jansher & Saman Zahid"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[UTF-8]{inputenc}
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# warnings=FALSE becauce the warning were only about when the loaded packages were built
+library(lab7)
+library(caret)
+library(mlbench)
+data(BostonHousing)
+```
+
+This vignette will show how to do a simple prediction using the `ridgereg()` class from the package lab7sarasara. In this vignette, the caret package will also be used as well as the data set BostonHousing from the mlbench package.
+
+## Partitioning data
+
+The BostonHousing data set can be partitioned into a training and test set in the following way. The variable medv is chosen as the dependent variable.
+
+```{r}
+set.seed(12345)
+train_index <- createDataPartition(y = BostonHousing$medv, p = 0.75, list = FALSE)
+training <- BostonHousing[train_index,]
+testing <- BostonHousing[-train_index,]
+```
+
+The data has now been divided into a training and a test data set.
+
+## Linear regression and model evaluation
+
+### lm method
+
+A linear regression model on the training function can be fitted with the `train()` function from the caret package.
+
+```{r, comment=NA}
+set.seed(12345)
+
+(lm1 <- caret::train(medv ~ ., data=training, method = 'lm'))
+```
+
+All covariates were used in the model estimation, and the only coefficients not significant were those for variables crim, indus and age. The RMSE value for the model is 5.01, the MAE value is 3.49 and $R^2$ is 68.9 percent.
+
+### leapForward method 
+
+```{r, comment=NA}
+set.seed(12345)
+
+(lm2 <- caret::train(medv ~ ., data=training, method = 'leapForward'))
+```
+
+As it can be seen in the printout above, the final value used for nvmax is 4. The independent variables used in the final model are rm, ptratio, b and lstat, which can be seen in the printout below.
+
+```{r, comment=NA}
+summary(lm2)$which
+```
+
+The final model with four variables has a RMSE value of 5.46, a MAE of 3.76 and $R^2$ is 63,4 percent.
+
+### Evaluation
+
+The first model with the 'lm' method has a better RMSE and MAE value which indicates a better performance with the first model.
+
+## Custom model and 10-fold cross-validation
+
+The ridgereg() reference class from the lab7sarasara package is used as a custom model when fitting a ridge regression model on the BostonHousing data. To use the `ridgereg()` function as a custom function, the following list should be used. Four lambda values are tested.
+
+```{r}
+ridge <- list(type="Regression", 
+              library="lab7",
+              loop=NULL,
+              prob=NULL)
+ridge$parameters <- data.frame(parameter="lambda",
+                               class="numeric",
+                               label="lambda")
+ridge$grid <- function(y,x, len=NULL, search="grid"){
+  data.frame(lambda=c(0.1,0.5,1,2))
+}
+ridge$fit <- function (x, y, wts, param, lev, last, classProbs, ...) {
+  dat <- if (is.data.frame(x)) 
+    x
+  else as.data.frame(x)
+  dat$.outcome <- y
+  out <- ridgereg$new(.outcome ~ ., data = dat, lambda=param$lambda, ...)
+  out
+}
+ridge$predict <- function (modelFit, newdata, submodels = NULL) {
+  if (!is.data.frame(newdata)) 
+    newdata <- as.data.frame(newdata)
+  newdata[,apply(newdata, MARGIN=2, sd)!=0] <- scale(newdata[,apply(newdata, MARGIN=2, sd)!=0])
+  modelFit$predict(newdata)
+}
+```
+
+To use 10-fold cross-validation on the training set, the following code is needed.
+
+```{r}
+control <- trainControl(method = "repeatedcv",
+                        number=10,
+                        repeats = 10)
+```
+
+At last, the ridge regression can be used on the training set with the code below.
+
+```{r, comment=NA}
+set.seed(12345)
+(lm.ridge <- train(medv ~ ., data=training, method=ridge, trControl=control))
+```
+
+
+The best $\lambda$ value, found with 10-fold cross-validation on the training set, is $\lambda=2$, which can be seen in the printout above. The RMSE for this model is lower than the two previous models.
+
+
+## Model evaluation
+
+The performance of all three models are evaluated on the test set by computing the RMSE, $R^2$ and MAE.
+
+```{r}
+# Linear regression
+set.seed(12345)
+test_lm1 <- predict(lm1, testing)
+postResample(pred=test_lm1, obs=testing$medv )
+
+# Linear regression leap forward
+set.seed(12345)
+test_lm2 <- predict(lm2, testing)
+postResample(pred=test_lm2, obs=testing$medv )
+
+# Ridge regression
+set.seed(12345)
+test_ridge <- predict(lm.ridge, testing)
+postResample(pred=test_ridge, obs=testing$medv )
+```
+
+From the output it can be concluded that, when evaluated on the test set, the linear reression performs the best.

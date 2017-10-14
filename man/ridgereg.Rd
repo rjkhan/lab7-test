@@ -20,9 +20,7 @@ RC class mainpluate linear algeric caluclautions giving formula and data.
 \describe{
 \item{\code{coef()}}{This function returns the vector of beta coefficients}
 
-\item{\code{initialize(formula, data, lambda = 0, normalize = FALSE)}}{This function acts as constructor}
-
-\item{\code{predict()}}{This function returns the vector of calculated fitted values}
+\item{\code{predict(newdata = NULL)}}{Prints out the predicted values or if newdata is used, prints out predicted values for the new data set}
 
 \item{\code{print()}}{This function prints the formula and dataset name as well as the calculated coefficients}
 }}
