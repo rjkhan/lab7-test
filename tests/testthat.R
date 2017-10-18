@@ -1,4 +1,4 @@
 library(testthat)
-library(lab7)
+library(statPack)
 
-test_check("lab7")
+test_check("statPack")

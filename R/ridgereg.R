@@ -5,85 +5,72 @@
 #' @name ridgereg
 #' @export ridgereg
 #' @exportClass ridgereg
+ 
+ridgereg<-setRefClass("ridgereg",
+                      fields=list(formula="formula", data="data.frame",
+                                  lambda="numeric",  beta_ridge="numeric",
+                                  datasetName="character",y_hat="numeric"
+                                  ),
+                      methods= list(
+                        initialize = function(formula, data, lambda = 0)
+                        {
+                          "This function acts as constructor"
+                          
+                          X <- model.matrix(formula,data)
+                          formula <<- formula #formula assign to class formula variable
+                          data <<- data #data assign to class data variable
+                          lambda <<- lambda #lambda
+                        
+                          y<-data[,colnames(data)==all.vars(formula)[1], drop=FALSE]
+                          
+                          #normalize the data if normiliz param is TRUE
+                          for(i in 2:ncol(X))
+                            X[,i] <- ( X[,i] - mean(X[,i] )) / sd(X[,i] )
+                      
+                          # QR decompsotion
+                          QR_X <- qr(X)
+                          Q <- qr.Q(QR_X)
+                          R <- qr.R(QR_X)
+                          ######
+                          mat_Y <- as.matrix(y)
+                          
+                          #beta_calcultion
+                          i_mat <- diag(lambda, nrow = ncol(X))
+                          beta_hat <- solve( t(R) %*% R + i_mat) %*% ( t(X) %*% mat_Y)
+                          beta_ridge <<- beta_hat[,1]
+                          y_hat <<- as.numeric(X %*% beta_ridge)
 
-ridgereg <- setRefClass("ridgereg",
-                        fields = list(formula="formula",data="data.frame",
-                                      lambda="numeric",datasetName="character",
-                                      beta_ridge="matrix", y_hat = "numeric",
-                                      ridge_coef="numeric"),
-                        methods = list(
-                          initialize= function(formula,data,lambda = 0, normalize = FALSE)
+                          #extract dataset name
+                          datasetName <<-  deparse(substitute(data))
+                        },
+                        predict = function(values_v = NULL)
+                        {
+                          "This function returns the vector of calculated fitted values"
+                          if(!(is.null(values_v)))
                           {
-                            "This function acts as constructor"
-
-                            formula <<- formula #formula assign to class formula variable
-                            data <<- data #data assign to class data variable
-                            lambda <<- lambda #lambda
-
-                            X <- model.matrix(formula,data)
-                            Y <- data[[(all.vars(formula)[1])]]
-
-                            #normalize the data if normiliz param is TRUE
-                            for(i in 2:ncol(X))
-                              X[,i] <- ( X[,i] - mean(X[,i] )) / sd(X[,i] )
-
-                            #Qr decompistion
-                            QR_X <- qr(X)
-                            QR_R <- qr.R(QR_X)
-
-                            I_mat <- matrix(c(0),nrow = ncol(X),ncol = ncol(X)) #create a identity Matrix
-                            diag(I_mat) <- lambda #update diagnal of lambda matrix of I_mat
-                            mat_Y <- as.matrix(Y) #convert into martix
-                            beta_ridge <<- solve(( (t(QR_R) %*% QR_R) + I_mat)) %*% (t(X) %*% mat_Y )
-
-
-
-                            y_hat <<- as.numeric(X %*% beta_ridge)    #y_hat calculate
-
-                            ridge_t <- as.numeric(beta_ridge)
-                            names(ridge_t) <- rownames(beta_ridge)
-
-                            ridge_coef <<- ridge_t[-1]
-                            #extract dataset name
-                            datasetName <<-  deparse(substitute(data))
-
-                          },
-                          predict =  function()
-                          {
-                            "This function returns the vector of calculated fitted values"
-                            return(y_hat)
-                          },
-                          coef = function()
-                          {
-                            "This function returns the vector of beta coefficients  "
-                            return(ridge_coef)
-                          },
-
-                          print = function()
-                          {
-                            "This function prints the formula and dataset name as well as the calculated coefficients"
-                            r_name <- rownames(as.data.frame(ridge_coef))
-                            cat("Call:")
-                            cat("\n")
-                            formula_print<- paste0("ridgereg(","formula = ",formula[2]," ",formula[1]," ",formula[3],", ","data = ",datasetName,")",sep="")
-                            cat(formula_print)
-                            cat("\n")
-                            cat("\n")
-                            cat("Coefficients:")
-                            cat("\n")
-                            cat(" ")
-                            cat(r_name)
-                            cat(" ")
-                            cat("\n")
-                            cat(ridge_coef)
-                            cat("\n")
-                            cat("\n")
-
-                          }
-
-
-                        )
-)
+                            values_v <- data.frame( Intercept = 1 , values_v )
+                            result <- ( as.matrix(values_v) %*% matrix(beta_ridge, nrow = length(beta_ridge)))
+                            return(result[,1])
+                          } 
+                          return(y_hat)
+                        },
+                        coef = function()
+                        {
+                          "Prints out the estimated coefficients"
+                          return(beta_ridge)
+                        },
+                        print = function()
+                        {
+                          "This function prints the formula and dataset name as well as the calculated coefficients"
+                          cat("Call:")
+                          cat("\n")
+                          formula_print<- paste0("ridgereg(","formula = ",formula[2]," ",formula[1]," ",formula[3],", ","data = ",datasetName,", lambda = ", lambda, ")", "\n", "\n", sep="")
+                          cat(formula_print)
+                          cat("Coefficients:")
+                          cat("\n")
+                          beta_ridge
+                        }
+                      ))
 
 # a<- ridgereg(Petal.Length ~ Sepal.Width + Sepal.Length,data=iris, lambda= 2.6)
 # a$coef()

@@ -18,11 +18,11 @@ RC class mainpluate linear algeric caluclautions giving formula and data.
 \section{Methods}{
 
 \describe{
-\item{\code{coef()}}{This function returns the vector of beta coefficients}
+\item{\code{coef()}}{Prints out the estimated coefficients}
 
-\item{\code{initialize(formula, data, lambda = 0, normalize = FALSE)}}{This function acts as constructor}
+\item{\code{initialize(formula, data, lambda = 0)}}{This function acts as constructor}
 
-\item{\code{predict()}}{This function returns the vector of calculated fitted values}
+\item{\code{predict(values_v = NULL)}}{This function returns the vector of calculated fitted values}
 
 \item{\code{print()}}{This function prints the formula and dataset name as well as the calculated coefficients}
 }}

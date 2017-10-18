@@ -1,6 +1,7 @@
-Package: lab7
+
+Package: statPack
 Type: Package
-Title: This is lab7 for rigereg
+Title: What the Package Does (Title Case)
 Version: 1.0
 Date: 2017-09-09
 Author: Saman Zahid [aut, cre],
@@ -15,8 +16,6 @@ Depends: R (>= 2.10)
 Imports: ggplot2
 Suggests: testthat, knitr,ggplot2,
     rmarkdown,
-    magick,
-    grid,
     nycflights13,
     dplyr,
     mlbench,

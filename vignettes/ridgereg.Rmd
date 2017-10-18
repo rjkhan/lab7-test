@@ -1,0 +1,132 @@
+---
+title: "Implementation of ridreg regression Class `ridreg` "
+author: "Saman and Rabnawaz"
+header-includes:
+   - \usepackage{statPack}
+package: statPack
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Using the caret package and your ridgereg() function to create a predictive model for the BostonHousing data found in the mlbench package.
+
+## The Document should include the following:
+- Divide the BostonHousing data (or your own API data) into a test and training dataset using the
+caret package.
+- Fit a linear regression model and a linear regression model with forward selection of covariates on the training dataset. Information on linear regression models in the caret package can be found here http://topepo.github.io/caret/Linear Regression.html.
+- Evaluate the performance of this model on the training dataset.
+- Fit a ridge regression model using your ridgereg() function to the training dataset for different
+values of. How to include custom models in caret is described here
+http://topepo.github.io/caret/custom models.html.
+- Find the best hyperparameter value for using 10-fold cross-validation on the training set. More
+information how to use the caret package for training can be found here
+https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf and here
+http://topepo.github.io/caret/training.html.
+- Evaluate the performance of all three models on the test dataset and write some concluding com-
+ments.
+
+### 1. Divide the BostonHousing data
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(caret)
+library(mlbench)
+library(statPack)
+
+data(BostonHousing)
+
+```
+
+
+### Creating Test and Training Data set
+```{r}
+data("BostonHousing") #load a data
+boston_data <- BostonHousing #set a data to variable
+indexes = createDataPartition(boston_data$medv, p = .75, list = FALSE, times = 1)
+training<- boston_data[indexes,] #assigninng 75% data to test
+testing<- boston_data[-indexes,]  #assigning remaining 25% data to training set
+
+```
+
+The data has now been divided into a training and a test data set.
+
+## Linear regression and model evaluation
+
+### lm method
+
+A linear regression model on the training function can be fitted with the `train()` function from the caret package.
+
+### 2. Fit Linear Regression Model and Linear Regression Model with Forward selection
+
+```{r}
+set.seed(-312312L)
+ridgereg_fit <- train(rm ~ . , data = training, method = "lm")
+print(ridgereg_fit)
+
+ridgereg_forward_fit <- train(rm ~ ., data = training, method = "leapForward")
+print(ridgereg_forward_fit)
+```
+### 3. performance of this model on the training dataset.
+The lm is better value f RMSE and MAE than leap forward so `Lm` is better
+
+
+
+The first model with the 'lm' method has a better RMSE and MAE value which indicates a better performance with the first model.
+
+### 4. Creating Custom Model for Ridge Regression
+```{r}
+ridge <- list(type="Regression", 
+              library="statPack",
+              loop=NULL,
+              prob=NULL)
+ridge$parameters <- data.frame(parameter="lambda",
+                               class="numeric",
+                               label="lambda")
+ridge$grid <- function(y,x, len=NULL, search="grid"){
+  data.frame(lambda=c(0.1,0.5,1,2))
+}
+ridge$fit <- function (x, y, wts, param, lev, last, classProbs, ...) {
+  dat <- if (is.data.frame(x)) 
+    x
+  else as.data.frame(x)
+  dat$.outcome <- y
+  out <- ridgereg$new(.outcome ~ ., data = dat, lambda=param$lambda, ...)
+  out
+}
+ridge$predict <- function (modelFit, newdata, submodels = NULL) {
+  if (!is.data.frame(newdata)) 
+    newdata <- as.data.frame(newdata)
+  newdata[,apply(newdata, MARGIN=2, sd)!=0] <- scale(newdata[,apply(newdata, MARGIN=2, sd)!=0])
+  modelFit$predict(newdata)
+}
+```
+
+```{r}
+#result will store in train function
+result <- train( medv ~ ., data=training, method=ridge)
+```
+
+
+### 5. Appication of 10-fold cross validation
+```{r}
+fitControl <- control <- trainControl(method = "repeatedcv",
+                        number=10,
+                        repeats = 10)
+
+ result <- train(crim ~ ., data = training,method = ridge,preProc = c("scale","center"),
+       tuneLength = 10,trControl = fitControl)
+````
+
+
+### 6.Evaluation of Models:
+Based on the RMSE values of each model, it is estimated that `linear model` is better than `ridereg and leap forward regressions`.
+
+## `Repo link`
+
+> "Here you can find a private repo link which will be public soon"
+([Rcourse-Lab7](https://github.com/rjkhan/RCourse-lab7))
+
+#### query
+`rabnsh696@student.liu.se` or `samza595@student.liu.se` 
